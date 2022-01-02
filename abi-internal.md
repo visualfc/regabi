@@ -164,6 +164,8 @@ type layout and should instead use the constants defined in
 
 ## Function call argument and result passing
 
+## 函数调用参数和结果传递
+
 Function calls pass arguments and results using a combination of the
 stack and machine registers.
 Each argument or result is passed either entirely in registers or
@@ -173,6 +175,22 @@ stack, arguments and results are preferentially passed in registers.
 However, any argument or result that contains a non-trivial array or
 does not fit entirely in the remaining available registers is passed
 on the stack.
+
+
+Function calls pass arguments and results using a combination of the
+stack and machine registers.
+Each argument or result is passed either entirely in registers or
+entirely on the stack.
+Because access to registers is generally faster than access to the
+stack, arguments and results are preferentially passed in registers.
+However, any argument or result that contains a non-trivial array or
+does not fit entirely in the remaining available registers is passed
+on the stack.
+
+函数调用参数和结果使用堆栈和计算机寄存器的组合。
+每个参数或结果要么完全在寄存器中传递，要么完全在堆栈上。
+因为访问寄存器通常比访问堆栈要快，所以参数和结果优先在寄存器中传递。
+但是，任何参数或结果包含非平凡数组或者不完全适合剩余可用寄存器的情况下使用堆栈传递。
 
 Each architecture defines a sequence of integer registers and a
 sequence of floating-point registers.
@@ -186,8 +204,13 @@ Beyond the arguments and results passed on the stack, the caller also
 reserves spill space on the stack for all register-based arguments
 (but does not populate this space).
 
+每个体系结构定义一系列整数寄存器和浮点寄存器序列。
+在高层，参数和结果被递归地分解转换为基础类型值，并将这些基值指定给来自这些序列的寄存器。
+
 The receiver, arguments, and results of function or method F are
 assigned to registers or the stack using the following algorithm:
+
+函数或方法 F 的接收器、参数和结果是使用以下算法分配给寄存器或堆栈:
 
 1. Let NI and NFP be the length of integer and floating-point register
    sequences defined by the architecture.
