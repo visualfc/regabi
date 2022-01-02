@@ -118,6 +118,10 @@ field.
 An interface can only be direct if the value consists of a single
 pointer word.
 
+任何其他接口类型（除了空接口）都属于序列 1. 指向运行时 “itab” 的指针，该指针提供方法指针和数据字段的类型。 2. `unsafe.Pointer` 数据字段。
+接口可以是“直接”或“间接”，具体取决于动态类型：直接接口将值直接存储在数据字段中，间接接口存储指向数据中值的指针。
+只有当值由单个指针构成时，才是直接接口。
+
 An array type `[N]T` is a sequence of N fields of type T.
 
 The slice type `[]T` is a sequence of a `*[cap]T` pointer to the slice
