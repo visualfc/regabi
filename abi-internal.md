@@ -9,26 +9,49 @@ If you’re writing assembly code, please instead refer to Go’s
 [assembly documentation](/doc/asm.html), which describes Go’s stable
 ABI, known as ABI0.
 
+本文档描述 Go 的 内部应用程序接口 (ABI)，称为 ABIInternal.
+Go 的 ABI 定义了数据在内存中的布局和 Go 函数调用规则。
+这个ABI是 *不稳定的* 并且在 Go 版本之间会发生变化。
+如果你正在写汇编代码，请参考 Go [汇编文档](/doc/asm.html)，它描述了Go的稳定性
+ABI，也就是ABI0。
+
 All functions defined in Go source follow ABIInternal.
 However, ABIInternal and ABI0 functions are able to call each other
 through transparent *ABI wrappers*, described in the [internal calling
+convention proposal](https://golang.org/design/27539-internal-abi).
+
+所有在 Go 源码中定义的函数都遵循 ABIInternal。
+然而，ABIInternal 和 ABI0 函数可以通过透明的 *ABI wrappers* 互相调用，
+相关描述在 [internal calling
 convention proposal](https://golang.org/design/27539-internal-abi).
 
 Go uses a common ABI design across all architectures.
 We first describe the common ABI, and then cover per-architecture
 specifics.
 
+Go 在所有架构中使用通用 ABI 设计。我们首先描述通用 ABI，然后介绍每个体系结构细节。
+
 *Rationale*: For the reasoning behind using a common ABI across
 architectures instead of the platform ABI, see the [register-based Go
 calling convention proposal](https://golang.org/design/40724-register-calling).
 
+*基本原理*: 使用跨平台的通用 ABI 代替平台 ABI，参见 [register-based Go
+calling convention proposal](https://golang.org/design/40724-register-calling).
+
+
 ## Memory layout
+
+## 内存布局
 
 Go's built-in types have the following sizes and alignments.
 Many, though not all, of these sizes are guaranteed by the [language
 specification](/doc/go_spec.html#Size_and_alignment_guarantees).
 Those that aren't guaranteed may change in future versions of Go (for
 example, we've considered changing the alignment of int64 on 32-bit).
+
+Go 的内置类型具有以下的大小和对齐方式。
+许多(尽管不是全部)大小是由[语言规范](/ doc / go_spec.html # Size_and_alignment_guarantees)。
+保证的。在未来版本的围棋中，那些不能保证的规则可能会改变（例如，我们考虑过改变 int64 在32位上的对齐方式)。
 
 | Type | 64-bit |       | 32-bit |       |
 | ---  | ---    | ---   | ---    | ---   |
