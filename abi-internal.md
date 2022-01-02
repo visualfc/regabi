@@ -49,7 +49,7 @@ specification](/doc/go_spec.html#Size_and_alignment_guarantees).
 Those that aren't guaranteed may change in future versions of Go (for
 example, we've considered changing the alignment of int64 on 32-bit).
 
-Go 的内置类型具有以下的大小和对齐方式。
+Go 的内置类型具有如下的大小和对齐方式。
 许多(尽管不是全部)大小是由[语言规范](/ doc / go_spec.html # Size_and_alignment_guarantees)。
 保证的。在未来版本的围棋中，那些不能保证的规则可能会改变（例如，我们考虑过改变 int64 在32位上的对齐方式)。
 
@@ -71,7 +71,11 @@ The types `byte` and `rune` are aliases for `uint8` and `int32`,
 respectively, and hence have the same size and alignment as these
 types.
 
+类型 `byte` 和 `rune` 分别是 `uint8` 和 `int32` 的别名，因此和对应类型具有相同的大小和对齐方式。
+
 The layout of `map`, `chan`, and `func` types is equivalent to *T.
+
+类型 `map`、 `chan`、 和 `func` 的布局等同于 *T.
 
 To describe the layout of the remaining composite types, we first
 define the layout of a *sequence* S of N fields with types
@@ -79,6 +83,10 @@ t<sub>1</sub>, t<sub>2</sub>, ..., t<sub>N</sub>.
 We define the byte offset at which each field begins relative to a
 base address of 0, as well as the size and alignment of the sequence
 as follows:
+
+为了描述其余复合类型的布局，我们首先定义一个包含 N 个字段的 *序列* S 的布局，字段类型为
+t<sub>1</sub>, t<sub>2</sub>, ..., t<sub>N</sub>.
+我们定义每个字段开始时相对于基址 0 的字节偏移量，以及序列的大小和对齐方式如下:
 
 ```
 offset(S, i) = 0  if i = 1
@@ -92,9 +100,14 @@ sizeof(S)    = 0  if N = 0
 Where sizeof(T) and alignof(T) are the size and alignment of type T,
 respectively, and align(x, y) rounds x up to a multiple of y.
 
+其中 sizeof(T) 和 alignof(T) 分别表示类型 T 的大小和对齐方式，align(x, y) 将 x 舍入到 y 的倍数。
+
 The `interface{}` type is a sequence of 1. a pointer to the runtime type
 description for the interface's dynamic type and 2. an `unsafe.Pointer`
 data field.
+
+接口 `interface{}` 类型序列为 1. 一个指向描述接口动态类型的运行时类型的指针 2. 一个 `unsafe.Pointer` 数据字段。
+
 Any other interface type (besides the empty interface) is a sequence
 of 1. a pointer to the runtime "itab" that gives the method pointers and
 the type of the data field and 2. an `unsafe.Pointer` data field.
