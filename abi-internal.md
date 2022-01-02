@@ -285,6 +285,21 @@ Register-assignment of a value V of underlying type T works as follows:
 1. If I > NI or FP > NFP, fail.
 1. If any recursive assignment above fails, fail.
 
+底层类型 T 的值 V 的寄存器分配工作如下：
+
+1. 如果 T 是布尔或整数类型，适合整数寄存器，则将 V 分配给寄存器 I 并且增量 I。
+1. 如果 T 是整数类型，适合两个整数寄存器，则将 V 的低位和高位分别分配给寄存器 I 和 I+1，并将 I 增加 2
+1. 如果 T 是浮点类型并且可以在浮点寄存器中表示而不丢失精度，将 V 分配给寄存器 FP 并且增量 FP。
+1. 如果 T 是复数类型，则递归地寄存器分配其实数和虚数部分。
+1. 如果 T 是指针类型、map 类型、channel 类型或函数类型，将 V 分配给寄存器 I 和增量 I。
+1. 如果 T 是字符串类型、接口类型或切片类型，则递归地寄存器分配 V 的组件（字符串和接口有 2 个，切片有 3 个）。
+1. 如果 T 是结构体类型，递归地寄存器分配 V 的每个字段。
+1. 如果 T 是长度为 0 的数组类型，则不做任何操作。
+1. 如果 T 是长度为 1 的数组类型，则递归地对其一个元素进行寄存器分配。
+1. 如果 T 是长度大于 1 的数组类型，则失败。
+1. 如果 I > NI 或 FP > NFP，则失败。
+1. 如果上述任何递归分配失败，则失败。
+
 The above algorithm produces an assignment of each receiver, argument,
 and result to registers or to a field in the stack sequence.
 The final stack sequence looks like: stack-assigned receiver,
