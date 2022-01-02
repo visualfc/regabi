@@ -309,6 +309,12 @@ pointer-alignment.
 The following diagram shows what this stack frame looks like on the
 stack, using the typical convention where address 0 is at the bottom:
 
+上述算法生成和分配每个接收器、参数和结果到寄存器或者失败后到堆栈序列。
+最后的堆栈序列看起来像这样: 堆栈分配接收器，堆栈分配所有参数，指针对齐，堆栈分配所有结果，指针对齐，
+每个寄存器分配参数的溢出空间，指针对齐。
+
+下图显示了此堆栈帧在堆栈上显示的样子，使用地址 0 位于底部的典型约定：
+
     +------------------------------+
     |             . . .            |
     | 2nd reg argument spill space |
