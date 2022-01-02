@@ -124,9 +124,14 @@ pointer word.
 
 An array type `[N]T` is a sequence of N fields of type T.
 
+数组类型 `[N]T` 是由 N 个类型为 T 的字段组成的序列。
+
 The slice type `[]T` is a sequence of a `*[cap]T` pointer to the slice
 backing store, an `int` giving the `len` of the slice, and an `int`
 giving the `cap` of the slice.
+
+切片类型 `[]T` 的序列包含一个 `*[cap]T` 的指针用作切片存储，一个 `int` 类型的 `len` 表示切片长度，
+一个 `int` 类型 `cap` 表示切片容量。
 
 The `string` type is a sequence of a `*[len]byte` pointer to the
 string backing store, and an `int` giving the `len` of the string.
