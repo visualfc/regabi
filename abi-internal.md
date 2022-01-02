@@ -130,11 +130,13 @@ The slice type `[]T` is a sequence of a `*[cap]T` pointer to the slice
 backing store, an `int` giving the `len` of the slice, and an `int`
 giving the `cap` of the slice.
 
-切片类型 `[]T` 的序列包含一个 `*[cap]T` 的指针用作切片存储，一个 `int` 类型的 `len` 表示切片长度，
+切片类型 `[]T` 的序列包含一个 `*[cap]T` 的指针指向切片后台存储，一个 `int` 类型的 `len` 表示切片长度，
 一个 `int` 类型 `cap` 表示切片容量。
 
 The `string` type is a sequence of a `*[len]byte` pointer to the
 string backing store, and an `int` giving the `len` of the string.
+
+字符串类型 `string` 的序列包含一个 `*[len]byte` 指针指向字符串后台存储，和一个 `int` 类型的 `len` 表示字符串的长度。
 
 A struct type `struct { f1 t1; ...; fM tM }` is laid out as the
 sequence t1, ..., tM, tP, where tP is either:
