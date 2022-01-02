@@ -1,5 +1,7 @@
 # Go internal ABI specification
 
+# Go 内部 ABI 规范
+
 This document describes Go’s internal application binary interface
 (ABI), known as ABIInternal.
 Go's ABI defines the layout of data in memory and the conventions for
@@ -144,12 +146,21 @@ sequence t1, ..., tM, tP, where tP is either:
 - Type `byte` if sizeof(tM) = 0 and any of sizeof(t*i*) ≠ 0.
 - Empty (size 0 and align 1) otherwise.
 
+结构体类型 `struct{f1 t1；…；fM tM}` 作为序列 t1, ..., tM, tP, 其中 tP 是：
+
+- 如果 sizeof(tM) == 0 并且任意 sizeof(t*i*) ≠ 0，则为 `byte` 类型。
+- 否则为空 (大小为0，对齐为1)
+
 The padding byte prevents creating a past-the-end pointer by taking
 the address of the final, empty fN field.
+
+填充字节以防止通过获取最后空的 fN 字段地址来一个创建越界指针。
 
 Note that user-written assembly code should generally not depend on Go
 type layout and should instead use the constants defined in
 [`go_asm.h`](/doc/asm.html#data-offsets).
+
+请注意，用户编写的汇编代码通常不应该依赖于 Go 类型布局，应该使用定义的常量 [`go_asm.h`](/doc/asm.html#data-offsets)。
 
 ## Function call argument and result passing
 
