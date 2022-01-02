@@ -235,8 +235,8 @@ assigned to registers or the stack using the following algorithm:
    设 S 为定义堆栈帧的类型序列，为空。
 1. 如果 F 是方法，分配 F 的接收器。
 1. 对于 F 的每个参数 A，分配 A。
-1. 向 S 添加指针对齐字段，该字段的大小为0，对齐方式与 `uintptr` 相同。
-1. 将 I 和 FP 重置为0。
+1. 向 S 添加指针对齐字段，该字段的大小为 0，对齐方式与 `uintptr` 相同。
+1. 将 I 和 FP 重置为 0。
 1. 对于 F 的每个结果 R，分配 R。
 1. 将指针对齐字段添加到 S。
 1. 对于 F 每个寄存器分配的接收器和参数，设 T 为其类型，并将 T 添加到堆栈序列 S 中。
@@ -251,6 +251,14 @@ as follows:
 1. Try to register-assign V.
 1. If step 2 failed, reset I and FP to the values from step 1, add T
    to the stack sequence S, and assign V to this field in S.
+
+对底层类型 T 的接收器、参数或结果 V 的赋值工作如下:
+
+1. 记住 I 和 FP。
+1. 如果 T 的大小为 0，则将 T 添加到堆栈序列 S 中并返回。
+1. 尝试分配寄存器给 V。
+1. 如果步骤 2 失败，则将 I 和 FP 重设为步骤 1 的值，并在堆栈序列 S 中添加 T，
+   并在 S 中将该字段赋值为 V。
 
 Register-assignment of a value V of underlying type T works as follows:
 
