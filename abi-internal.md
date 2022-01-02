@@ -210,8 +210,6 @@ reserves spill space on the stack for all register-based arguments
 The receiver, arguments, and results of function or method F are
 assigned to registers or the stack using the following algorithm:
 
-函数或方法 F 的接收器、参数和结果是使用以下算法分配给寄存器或堆栈:
-
 1. Let NI and NFP be the length of integer and floating-point register
    sequences defined by the architecture.
    Let I and FP be 0; these are the indexes of the next integer and
@@ -230,6 +228,7 @@ assigned to registers or the stack using the following algorithm:
    uninitialized at the call.
 1. Add a pointer-alignment field to S.
 
+函数或方法 F 的接收器、参数和结果是使用以下算法分配给寄存器或堆栈:
 
 1. 设 NI 和 NFP 为由体系结构定义的整数和浮点寄存器序列的长度。
    设 I 和 FP 为 0 作为下一个整数和浮点指针寄存器的索引。
