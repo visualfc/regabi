@@ -190,7 +190,7 @@ on the stack.
 函数调用参数和结果使用堆栈和机器寄存器的组合。
 每个参数或结果要么完全在寄存器中传递，要么完全在堆栈上。
 因为访问寄存器通常比访问堆栈要快，所以参数和结果优先在寄存器中传递。
-但是，任何参数或结果包含非平凡数组或者不完全适合剩余可用寄存器的情况下使用堆栈传递。
+但是，任何参数或结果包含 non-trivial 数组或者不完全适合剩余可用寄存器的情况下使用堆栈传递。
 
 Each architecture defines a sequence of integer registers and a
 sequence of floating-point registers.
@@ -443,9 +443,16 @@ creates the same problems as other large structs if the callee takes
 the address of an argument, and would benefit <0.1% of functions in
 kubelet (and even these very little).
 
+Non-trivial 数组总是通过堆栈传递，因为数组索引通常需要计算偏移量，一般是不可能使用寄存器的。
+数组一般在函数签名中很少见（Go 1.15标准库中只有0.7%的函数，kubelet 中只有0.2%）。
+我们考虑过允许数组字段在堆栈上传递，而参数的其余字段在寄存器中传递，但是如果被调用方想获取参数的地址，
+这会产生与其他大型结构相同的问题，并且会使kubelet中 <0.1% 的函数受益（甚至这些函数也很少）。
+
 We make exceptions for 0 and 1-element arrays because these don’t
 require computed offsets, and 1-element arrays are already decomposed
 in the compiler’s SSA representation.
+
+我们为 0 和 1 个元素数组设置了例外，因为它们不需要计算偏移量，并且 1 个元素数组已经在编译器的 SSA 表示中分解了。
 
 The ABI assignment algorithm above is equivalent to Go’s stack-based
 ABI0 calling convention if there are zero architecture registers.
