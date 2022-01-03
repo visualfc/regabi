@@ -348,7 +348,7 @@ There are no callee-save registers, so a call may overwrite any
 register that doesn’t have a fixed meaning, including argument
 registers.
 
-没有为被调用者保留寄存器，因为调用可能覆盖任何没有固定含义的寄存器，包括参数寄存器。
+没有为被调用者保留寄存器，因些调用可能覆盖任何没有固定含义的寄存器，包括参数寄存器。
 
 ### Example
 
