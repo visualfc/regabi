@@ -540,12 +540,14 @@ entirely – allowing most functions to be called without any stack
 setup and easing the introduction of callee-save registers – and
 separating the spill space makes that transition easier.
 
-溢出空间也可以插入在堆栈分配的参数中，以便参数按顺序显示，无论它们是寄存器分配的还是堆栈分配的。
+溢出空间也可以交错插入在堆栈分配的参数中，以便参数按顺序显示，无论它们是寄存器分配的还是堆栈分配的。
 这将接近于 ABI0，只是寄存器分配的参数将在堆栈上未初始化，并且不需要为寄存器分配的结果保留堆栈空间。
 由于内存的局部性，我们期望分隔开溢出空间以便执行性能更好。
 分隔溢出空间也潜在地使 `reflect` 调用更简单，因为这允许 `reflect` 将溢出空间汇总为单一数量。
 
 ## Closures
+
+## 闭包
 
 A func value (e.g., `var x func()`) is a pointer to a closure object.
 A closure object begins with a pointer-sized program counter
