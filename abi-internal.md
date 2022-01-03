@@ -37,7 +37,7 @@ Go 在所有架构中使用通用 ABI 设计。我们首先描述通用 ABI，�
 architectures instead of the platform ABI, see the [register-based Go
 calling convention proposal](https://golang.org/design/40724-register-calling).
 
-*基本原理*: 使用跨平台的通用 ABI 代替平台 ABI，参见 [register-based Go
+*原理*: 使用跨平台的通用 ABI 代替平台 ABI，参见 [register-based Go
 calling convention proposal](https://golang.org/design/40724-register-calling).
 
 
@@ -402,7 +402,7 @@ Only arguments, not results, are assigned a spill area on the stack.
 
 ### Rationale
 
-### 基本原理
+### 原理
 
 Each base value is assigned to its own register to optimize
 construction and access.
@@ -554,18 +554,30 @@ A closure object begins with a pointer-sized program counter
 representing the entry point of the function, followed by zero or more
 bytes containing the closed-over environment.
 
+函数值（例如，`var x func（）`）是指向闭包对象的指针。
+闭包对象以一个指针大小的指令计数器开始，表示函数的入口点，后跟零个或多个包含封闭环境的字节。
+
 Closure calls follow the same conventions as static function and
 method calls, with one addition. Each architecture specifies a
 *closure context pointer* register and calls to closures store the
 address of the closure object in the closure context pointer register
 prior to the call.
 
+闭包调用遵循与静态函数和方法调用相同的约定，只是带有一个附加。
+每个体系结构指定一个 *闭包上下文指针* 寄存器，
+对闭包的调用在调用之前将闭包对象的地址存储在闭包上下文指针寄存器中。
+
 ## Software floating-point mode
+
+## 软件浮点模式
 
 In "softfloat" mode, the ABI simply treats the hardware as having zero
 floating-point registers.
 As a result, any arguments containing floating-point values will be
 passed on the stack.
+
+在 "softfloat" 模式下，ABI 只是将硬件视为具有零个浮点寄存器。
+因此，任何包含浮点值的参数都将在堆栈上传递。
 
 *Rationale*: Softfloat mode is about compatibility over performance
 and is not commonly used.
@@ -573,31 +585,52 @@ Hence, we keep the ABI as simple as possible in this case, rather than
 adding additional rules for passing floating-point values in integer
 registers.
 
+*原理*：软浮点模式是关于兼容性而非性能的，不常用。
+因此，在这种情况下，我们尽量保持 ABI 的简单性，而不是加入在整数寄存器中传递浮点值的附加规则。
+
 ## Architecture specifics
+
+## 体系结构细节
 
 This section describes per-architecture register mappings, as well as
 other per-architecture special cases.
 
+本节描述每个体系结构寄存器映射，以及每个体系结构其他特殊情况。
+
 ### amd64 architecture
+
+### amd64 体系结构
 
 The amd64 architecture uses the following sequence of 9 registers for
 integer arguments and results:
+
+amd64 体系结构使用以下 9 个寄存器序列作为整数参数和结果：
 
     RAX, RBX, RCX, RDI, RSI, R8, R9, R10, R11
 
 It uses X0 – X14 for floating-point arguments and results.
 
+它使用 X0–X14 作为浮点参数和结果。
+
 *Rationale*: These sequences are chosen from the available registers
 to be relatively easy to remember.
 
+*原理*：这些序列从可用寄存器中选择，相对容易记忆。
+
 Registers R12 and R13 are permanent scratch registers.
 R15 is a scratch register except in dynamically linked binaries.
+
+寄存器 R12 和 R13 是永久性暂存寄存器。R15 是一个临时寄存器，动态链接的二进制文件除外。
 
 *Rationale*: Some operations such as stack growth and reflection calls
 need dedicated scratch registers in order to manipulate call frames
 without corrupting arguments or results.
 
+*原理*：某些操作（如堆栈增长和反射调用）需要专用的暂存寄存器，以便在不损坏参数或结果的情况下操作调用帧。
+
 Special-purpose registers are as follows:
+
+特殊用途寄存器如下：
 
 | Register | Call meaning | Return meaning | Body meaning |
 | --- | --- | --- | --- |
@@ -616,11 +649,19 @@ to be restored on transitions from ABI0 code to ABIInternal code.
 In ABI0, these are undefined, so transitions from ABIInternal to ABI0
 can ignore these registers.
 
+*原理*：这些寄存器含义与 Go 基于堆栈的调用约定兼容，但 R14 和 X15 除外，
+在从 ABI0 代码转换到 ABIInternal 代码时必须恢复。
+在ABI0中，这些寄存器是未定义的，因此从 ABIInternal 到 ABI0 的转换可以忽略这些寄存器。
+
 *Rationale*: For the current goroutine pointer, we chose a register
 that requires an additional REX byte.
 While this adds one byte to every function prologue, it is hardly ever
 accessed outside the function prologue and we expect making more
 single-byte registers available to be a net win.
+
+*原理*：对于当前 goroutine 指针，我们选择寄存器，这需要一个额外的 REX 字节。
+虽然这为每个函数序言添加了一个字节，但在函数序言之外几乎从未访问过它，
+我们希望能够提供更多的单字节寄存器，这将是一个净赢。
 
 *Rationale*: We could allow R14 (the current goroutine pointer) to be
 a scratch register in function bodies because it can always be
@@ -629,13 +670,21 @@ However, we designate it as a fixed register for simplicity and for
 consistency with other architectures that may not have a copy of the
 current goroutine pointer in TLS.
 
+*原理*：我们可以允许 R14（当前 goroutine 指针）作为函数体中的暂存寄存器，
+因为它总是可以从 amd64 上的 TLS 恢复。
+但是，我们将其指定为固定寄存器，这是为了简单以及与其他体系结构保持一致(TLS 中可能没有当前 goroutine 指针副本)，
+
 *Rationale*: We designate X15 as a fixed zero register because
 functions often have to bulk zero their stack frames, and this is more
 efficient with a designated zero register.
 
+*理由*：我们将 X15 指定为固定零寄存器，因为函数通常必须对其堆栈帧进行批量调零，使用指定的零寄存器更有效。
+
 *Implementation note*: Registers with fixed meaning at calls but not
 in function bodies must be initialized by "injected" calls such as
 signal-based panics.
+
+*实现说明*：在调用具有固定含义但不在函数体中的寄存器时必须通过 "injected" 调用进行初始化（如基于信号的 panics）。
 
 #### Stack layout
 
