@@ -352,12 +352,19 @@ registers.
 
 ### Example
 
+### 示例
+
 Consider the function `func f(a1 uint8, a2 [2]uintptr, a3 uint8) (r1
 struct { x uintptr; y [2]uintptr }, r2 string)` on a 64-bit
 architecture with hypothetical integer registers R0–R9.
 
+考虑函数 `func f(a1 uint8, a2 [2]uintptr, a3 uint8) (r1
+struct { x uintptr; y [2]uintptr }, r2 string)` 在 64 位体系统结构上，假定有 R0-R9 的整数寄存器。
+
 On entry, `a1` is assigned to `R0`, `a3` is assigned to `R1` and the
 stack frame is laid out in the following sequence:
+
+在输入时，将 `a1` 分配给 `R0`，将 `a3` 分配给 `R1`，并且堆栈帧按以下顺序排列：
 
     a2      [2]uintptr
     r1.x    uintptr
@@ -369,8 +376,12 @@ stack frame is laid out in the following sequence:
 In the stack frame, only the `a2` field is initialized on entry; the
 rest of the frame is left uninitialized.
 
+在堆栈帧中，只有 `a2` 字段在输入时被初始化；帧的其余部分未初始化。
+
 On exit, `r2.base` is assigned to `R0`, `r2.len` is assigned to `R1`,
 and `r1.x` and `r1.y` are initialized in the stack frame.
+
+在退出时，`r2.base` 分配给 `R0`，`r2.len` 分配给 `R1`，`r1.x` 和 `r1.y` 在堆栈帧中初始化。
 
 There are several things to note in this example.
 First, `a2` and `r1` are stack-assigned because they contain arrays.
