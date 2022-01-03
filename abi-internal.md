@@ -339,9 +339,16 @@ registers are left uninitialized.
 Upon return, the callee must have stored results to all result
 registers and result stack fields determined by the above algorithm.
 
+为了执行调用，调用方从其堆栈帧的最低地址开始为调用堆栈帧保留空间，
+将参数存储在上述算法确定的寄存器和参数堆栈字段中，并执行调用。
+在调用时，溢出空间、结果堆栈字段和结果寄存器未初始化。
+返回时，被调用方必须将结果存储到由上述算法确定的所有结果寄存器和结果堆栈字段中。
+
 There are no callee-save registers, so a call may overwrite any
 register that doesn’t have a fixed meaning, including argument
 registers.
+
+没有为被调用者保留寄存器，因为调用可能覆盖任何没有固定含义的寄存器，包括参数寄存器。
 
 ### Example
 
