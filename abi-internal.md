@@ -397,9 +397,9 @@ Only arguments, not results, are assigned a spill area on the stack.
 结果 `r2` 被分解为其各个组件，这些组件分别由寄存器分配。
 在堆栈上，堆栈分配的参数比堆栈分配的结果处在更低的地址，而堆栈分配的结果比参数溢出区域处在更低的地址。
 
-
-
 ### Rationale
+
+### 基本原理
 
 Each base value is assigned to its own register to optimize
 construction and access.
@@ -411,6 +411,12 @@ Modern architectures have more than enough registers to pass all
 arguments and results this way for nearly all functions (see the
 appendix), so there’s little downside to spreading base values across
 registers.
+
+每个基值都分配给自己的寄存器，以优化构造和访问。
+另一种方式是将多个子字值打包到寄存器中，或者简单地将参数的内存布局映射到寄存器（这在 C ABI 中常见），
+但这通常会增加成本来打包和解包这些值。
+现代体系结构拥有足够多的寄存器，几乎可以用这种方式为所有函数传递全部参数和结果（参见附录），
+因此，跨寄存器展开基值几乎没有什么不利方面。
 
 Arguments that can’t be fully assigned to registers are passed
 entirely on the stack in case the callee takes the address of that
