@@ -393,6 +393,12 @@ than the stack-assigned results, which appear at lower addresses than
 the argument spill area.
 Only arguments, not results, are assigned a spill area on the stack.
 
+在这个示例中有几点要注意。首先，`a2` 和 `r1` 使用堆栈分配是因为他们包含数组，其他参数和结果使用寄存器分配。
+结果 `r2` 被分解为其各个组件，这些组件分别由寄存器分配。
+在堆栈上，堆栈分配的参数比堆栈分配的结果处在更低的地址，而堆栈分配的结果比参数溢出区域处在更低的地址。
+
+
+
 ### Rationale
 
 Each base value is assigned to its own register to optimize
