@@ -351,7 +351,7 @@ There are no callee-save registers, so a call may overwrite any
 register that doesn’t have a fixed meaning, including argument
 registers.
 
-没有为被调用者保留寄存器，因些调用可能覆盖任何没有固定含义的寄存器，包括参数寄存器。
+没有为被调用方保留寄存器，因些调用可能覆盖任何没有固定含义的寄存器，包括参数寄存器。
 
 ### Example
 
@@ -463,6 +463,10 @@ An architecture may still define register meanings that aren’t
 compatible with ABI0, but these differences should be easy to account
 for in the compiler.
 
+如果体系结构寄存器为零，则上述 ABI 分配算法相当于 Go 基于堆栈的 ABI0 调用约定。
+这是为了简化到基于寄存器的内部 ABI 的转换，并使编译器更容易生成调用约定。
+体系结构可能仍然定义与 ABI0 不兼容的寄存器含义，但这些差异在编译器中应该很容易解释。
+
 The assignment algorithm assigns zero-sized values to the stack
 (assignment step 2) in order to support ABI0-equivalence.
 While these values take no space themselves, they do result in
@@ -472,6 +476,11 @@ values even on architectures that provide no argument registers
 because they don't consume any registers, and hence not add alignment
 padding to the stack.
 
+分配算法将大小为零的值分配给堆栈（分配步骤2），以支持 ABI0 等价性。
+虽然这些值本身不占用空间，但它们确实会导致 ABI0 中堆栈上的对齐填充。
+如果没有这个步骤，内部 ABI 将为寄存器分配零大小值，即使在不提供参数寄存器的体系结构上也是如此，
+因为它们不使用任何寄存器，因此不会向堆栈添加对齐填充。
+
 The algorithm reserves spill space for arguments in the caller’s frame
 so that the compiler can generate a stack growth path that spills into
 this reserved space.
@@ -480,6 +489,11 @@ enough additional stack space in its own frame to spill these, which
 is why it’s important that the caller do so.
 These slots also act as the home location if these arguments need to
 be spilled for any other reason, which simplifies traceback printing.
+
+该算法为调用方帧中的参数保留溢出空间，以便编译器可以生成溢出到此保留空间的堆栈增长路径。
+如果被调用方必须增加堆栈，它可能无法在自己的帧中保留足够的额外堆栈空间来溢出这些堆栈，
+这就是为什么调用方这样做的重要性。
+如果出于任何其他原因需要溢出这些参数，这些插槽还充当主位置，从而简化了回溯打印。
 
 There are several options for how to lay out the argument spill space.
 We chose to lay out each argument according to its type's usual memory
@@ -492,6 +506,12 @@ the compiler must spill that argument to memory in its usual memory
 layout and it's more convenient to use the argument spill space for
 this purpose.
 
+对于如何布置参数溢出空间，有几个选择。我们选择根据其类型的常规内存布局来布置每个参数，
+但要将溢出空间与常规参数空间分开。
+使用通常的内存布局可以简化编译器，因为它已经理解这种布局。
+此外，如果函数要寄存器分配参数的地址，编译器必须将该参数溢出到其通常的内存布局中，
+并且达到更加方便使用参数溢出空间的目的。
+
 Alternatively, the spill space could be structured around argument
 registers.
 In this approach, the stack growth spill path would spill each
@@ -499,6 +519,10 @@ argument register to a register-sized stack word.
 However, if the function takes the address of a register-assigned
 argument, the compiler would have to reconstruct it in memory layout
 elsewhere on the stack.
+
+或者，溢出空间可以围绕参数寄存器进行构造。
+在这种方法中，堆栈增长溢出路径会将每个参数寄存器溢出到寄存器大小的堆栈字。
+但是，如果函数要获取寄存器分配参数的地址，编译器将不得不在堆栈的其他位置的内存布局中重新构造它。
 
 The spill space could also be interleaved with the stack-assigned
 arguments so the arguments appear in order whether they are register-
@@ -515,6 +539,11 @@ Finally, the long-term intent is to remove reserved spill slots
 entirely – allowing most functions to be called without any stack
 setup and easing the introduction of callee-save registers – and
 separating the spill space makes that transition easier.
+
+溢出空间也可以插入在堆栈分配的参数中，以便参数按顺序显示，无论它们是寄存器分配的还是堆栈分配的。
+这将接近于 ABI0，只是寄存器分配的参数将在堆栈上未初始化，并且不需要为寄存器分配的结果保留堆栈空间。
+由于内存的局部性，我们期望分隔开溢出空间以便执行性能更好。
+分隔溢出空间也潜在地使 `reflect` 调用更简单，因为这允许 `reflect` 将溢出空间汇总为单一数量。
 
 ## Closures
 
