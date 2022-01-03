@@ -52,8 +52,8 @@ Those that aren't guaranteed may change in future versions of Go (for
 example, we've considered changing the alignment of int64 on 32-bit).
 
 Go 的内置类型具有如下的大小和对齐方式。
-许多(尽管不是全部)大小是由[语言规范](/ doc / go_spec.html # Size_and_alignment_guarantees)。
-保证的。在未来版本的围棋中，那些不能保证的规则可能会改变（例如，我们考虑过改变 int64 在32位上的对齐方式)。
+许多大小(尽管不是全部)是由[语言规范](/doc/go_spec.html#Size_and_alignment_guarantees)保证的。
+在未来版本的围棋中，那些不能保证的规则可能会改变（例如，我们考虑过改变 int64 在32位上的对齐方式)。
 
 | Type | 64-bit |       | 32-bit |       |
 | ---  | ---    | ---   | ---    | ---   |
@@ -108,7 +108,7 @@ The `interface{}` type is a sequence of 1. a pointer to the runtime type
 description for the interface's dynamic type and 2. an `unsafe.Pointer`
 data field.
 
-接口 `interface{}` 类型序列为 1. 一个指向描述接口动态类型的运行时类型的指针 2. 一个 `unsafe.Pointer` 数据字段。
+接口 `interface{}` 类型序列为 1. 指向描述接口动态类型的运行时类型的指针 2. `unsafe.Pointer` 数据字段。
 
 Any other interface type (besides the empty interface) is a sequence
 of 1. a pointer to the runtime "itab" that gives the method pointers and
@@ -187,7 +187,7 @@ However, any argument or result that contains a non-trivial array or
 does not fit entirely in the remaining available registers is passed
 on the stack.
 
-函数调用参数和结果使用堆栈和计算机寄存器的组合。
+函数调用参数和结果使用堆栈和机器寄存器的组合。
 每个参数或结果要么完全在寄存器中传递，要么完全在堆栈上。
 因为访问寄存器通常比访问堆栈要快，所以参数和结果优先在寄存器中传递。
 但是，任何参数或结果包含非平凡数组或者不完全适合剩余可用寄存器的情况下使用堆栈传递。
@@ -198,14 +198,17 @@ At a high level, arguments and results are recursively broken down
 into values of base types and these base values are assigned to
 registers from these sequences.
 
+每个体系结构定义一系列整数寄存器和浮点寄存器序列。
+在高层，参数和结果被递归地分解转换为基础类型值，并将这些基值分配给来自这些序列的寄存器。
+
 Arguments and results can share the same registers, but do not share
 the same stack space.
 Beyond the arguments and results passed on the stack, the caller also
 reserves spill space on the stack for all register-based arguments
 (but does not populate this space).
 
-每个体系结构定义一系列整数寄存器和浮点寄存器序列。
-在高层，参数和结果被递归地分解转换为基础类型值，并将这些基值指定给来自这些序列的寄存器。
+参数和结果可以共享相同的寄存器，但不能共享相同的堆栈空间。
+除了在堆栈上传递的参数和结果之外，调用方还在堆栈上为所有基于寄存器的参数保留溢出空间（但不填充此空间）。
 
 The receiver, arguments, and results of function or method F are
 assigned to registers or the stack using the following algorithm:
@@ -230,8 +233,8 @@ assigned to registers or the stack using the following algorithm:
 
 函数或方法 F 的接收器、参数和结果是使用以下算法分配给寄存器或堆栈:
 
-1. 设 NI 和 NFP 为由体系结构定义的整数和浮点寄存器序列的长度。
-   设 I 和 FP 为 0 作为下一个整数和浮点指针寄存器的索引。
+1. 设 NI 和 NFP 是由体系结构定义的整数和浮点寄存器序列的长度。
+   设 I 和 FP 为 0 ，作为下一个整数和浮点指针寄存器的索引。
    设 S 为定义堆栈帧的类型序列，为空。
 1. 如果 F 是方法，分配 F 的接收器。
 1. 对于 F 的每个参数 A，分配 A。
@@ -240,7 +243,7 @@ assigned to registers or the stack using the following algorithm:
 1. 对于 F 的每个结果 R，分配 R。
 1. 将指针对齐字段添加到 S。
 1. 对于 F 每个寄存器分配的接收器和参数，设 T 为其类型，并将 T 添加到堆栈序列 S 中。
-   这是参数(或接收器)的溢出空间，在调用时没有初始化。
+   这是参数(或接收器)的溢出空间，在调用时未初始化。
 1. 添加一个指针对齐字段到 S。
 
 Assigning a receiver, argument, or result V of underlying type T works
@@ -289,9 +292,9 @@ Register-assignment of a value V of underlying type T works as follows:
 
 1. 如果 T 是布尔或整数类型，适合整数寄存器，则将 V 分配给寄存器 I 并且增量 I。
 1. 如果 T 是整数类型，适合两个整数寄存器，则将 V 的低位和高位分别分配给寄存器 I 和 I+1，并将 I 增加 2
-1. 如果 T 是浮点类型并且可以在浮点寄存器中表示而不丢失精度，将 V 分配给寄存器 FP 并且增量 FP。
-1. 如果 T 是复数类型，则递归地寄存器分配其实数和虚数部分。
-1. 如果 T 是指针类型、map 类型、channel 类型或函数类型，将 V 分配给寄存器 I 和增量 I。
+1. 如果 T 是浮点类型并且可以在浮点寄存器中表示而不丢失精度，将 V 分配给寄存器 FP 并增量 FP。
+1. 如果 T 是复数类型，则递归地寄存器分配实数和虚数部分。
+1. 如果 T 是指针类型、map 类型、channel 类型或函数类型，将 V 分配给寄存器 I 并增量 I。
 1. 如果 T 是字符串类型、接口类型或切片类型，则递归地寄存器分配 V 的组件（字符串和接口有 2 个，切片有 3 个）。
 1. 如果 T 是结构体类型，递归地寄存器分配 V 的每个字段。
 1. 如果 T 是长度为 0 的数组类型，则不做任何操作。
@@ -340,7 +343,7 @@ Upon return, the callee must have stored results to all result
 registers and result stack fields determined by the above algorithm.
 
 为了执行调用，调用方从其堆栈帧的最低地址开始为调用堆栈帧保留空间，
-将参数存储在上述算法确定的寄存器和参数堆栈字段中，并执行调用。
+将全部参数存储在由上述算法确定的寄存器和参数堆栈字段中，并执行调用。
 在调用时，溢出空间、结果堆栈字段和结果寄存器未初始化。
 返回时，被调用方必须将结果存储到由上述算法确定的所有结果寄存器和结果堆栈字段中。
 
@@ -413,10 +416,10 @@ appendix), so there’s little downside to spreading base values across
 registers.
 
 每个基值都分配给自己的寄存器，以优化构造和访问。
-另一种方式是将多个子字值打包到寄存器中，或者简单地将参数的内存布局映射到寄存器（这在 C ABI 中常见），
+另一种方式是将多个子字值打包到寄存器中，或者简单地将参数的内存布局映射到寄存器中（这在 C ABI 中常见），
 但这通常会增加成本来打包和解包这些值。
 现代体系结构拥有足够多的寄存器，几乎可以用这种方式为所有函数传递全部参数和结果（参见附录），
-因此，跨寄存器展开基值几乎没有什么不利方面。
+因此跨寄存器展开基值几乎没有什么不利方面。
 
 Arguments that can’t be fully assigned to registers are passed
 entirely on the stack in case the callee takes the address of that
@@ -424,6 +427,10 @@ argument.
 If an argument could be split across the stack and registers and the
 callee took its address, it would need to be reconstructed in memory,
 a process that would be proportional to the size of the argument.
+
+无法完全分配给寄存器的参数将完全使用堆栈传递，以备被调用方获取该参数的地址。
+如果一个参数可以在堆栈和寄存器之间拆分，并且被调用方要获取其地址，则需要在内存中重新构造它，
+这是与参数大小成比例的处理过程。
 
 Non-trivial arrays are always passed on the stack because indexing
 into an array typically requires a computed offset, which generally
