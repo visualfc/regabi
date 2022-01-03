@@ -793,12 +793,18 @@ Go 在 amd64 上不使用 x87 浮点控制字。
 
 ### Spill path improvements
 
+### 溢出路径改进
+
 The ABI currently reserves spill space for argument registers so the
 compiler can statically generate an argument spill path before calling
 into `runtime.morestack` to grow the stack.
 This ensures there will be sufficient spill space even when the stack
 is nearly exhausted and keeps stack growth and stack scanning
 essentially unchanged from ABI0.
+
+ABI 目前为参数寄存器保留溢出空间，因此编译器可以在调用 `runtime.morestack` 增加堆栈之前
+静态生成参数溢出路径。
+这确保了即使在堆栈几乎耗尽时仍有足够的溢出空间，并保持堆栈增长和堆栈扫描与 ABI0 本质上没有变化。
 
 However, this wastes stack space (the median wastage is 16 bytes per
 call), resulting in larger stacks and increased cache footprint.
@@ -811,10 +817,20 @@ stack growth check.
 For `nosplit` functions, this would change the threshold used in the
 linker's static stack size check.
 
+但是，这会浪费堆栈空间（每个调用的平均损耗为16字节），导致堆栈变大，缓存占用空间增加。
+更好的方法是仅在溢出时保留堆栈空间。
+确保有足够的空间用于溢出的一种方法是为每个函数确保有足够的空间用于函数自己的帧 *以及* 它调用的
+所有函数的溢出空间。
+对于大多数函数，这将更改序言堆栈增长检查的阈值。
+对于 `nosplit` 函数，这将更改链接器静态堆栈大小检查中使用的阈值。
+
 Allocating spill space in the callee rather than the caller may also
 allow for faster reflection calls in the common case where a function
 takes only register arguments, since it would allow reflection to make
 these calls directly without allocating any frame.
+
+在函数只接受寄存器参数的常见情况下，在被调用方而不是调用方中分配溢出空间也可以允许更快的反射调用，
+因为这样可以允许反射直接进行这些调用而无需分配任何帧。
 
 The statically-generated spill path also increases code size.
 It is possible to instead have a generic spill path in the runtime, as
