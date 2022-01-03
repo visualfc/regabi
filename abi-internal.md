@@ -724,9 +724,11 @@ The Go ABI's use of RBP as a frame pointer register is compatible with
 amd64 platform conventions so that Go can inter-operate with platform
 debuggers and profilers.
 
-Go ABI 将 RBP 用作帧指针寄存器与 amd64 平台惯例保持兼容，因此 Go 可以与平台调试器和分析器交互操作。
+Go ABI 将 RBP 用作帧指针寄存器与 amd64 平台约定保持兼容，因此 Go 可以与平台调试器和分析器交互操作。
 
 #### Flags
+
+#### 标志位
 
 The direction flag (D) is always cleared (set to the “forward”
 direction) at a call.
@@ -734,14 +736,25 @@ The arithmetic status flags are treated like scratch registers and not
 preserved across calls.
 All other bits in RFLAGS are system flags.
 
+在调用时，方向标志位（D）始终清除（设置为 “forward” 方向）。
+算术运算状态标志位被视为临时寄存器，不会在调用之间保留。
+RFLAGS 中的所有其他位都是系统标志位。
+
 At function calls and returns, the CPU is in x87 mode (not MMX
 technology mode).
+
+在函数调用和返回时，CPU 处于 x87 模式（不是 MMX technology 模式）。
 
 *Rationale*: Go on amd64 does not use either the x87 registers or MMX
 registers. Hence, we follow the SysV platform conventions in order to
 simplify transitions to and from the C ABI.
 
+*理由*：Go 在 amd64 下不使用 x87 寄存器或 MMX 寄存器。
+因此，我们遵循 SysV 平台约定，以简化与 C ABI 之间的转换。
+
 At calls, the MXCSR control bits are always set as follows:
+
+在调用时，MXCSR 控制位始终设置如下：
 
 | Flag | Bit | Value | Meaning |
 | --- | --- | --- | --- |
@@ -757,6 +770,8 @@ At calls, the MXCSR control bits are always set as follows:
 
 The MXCSR status bits are callee-save.
 
+MXCSR 状态位是被调用者保存。
+
 *Rationale*: Having a fixed MXCSR control configuration allows Go
 functions to use SSE operations without modifying or saving the MXCSR.
 Functions are allowed to modify it between calls (as long as they
@@ -764,9 +779,17 @@ restore it), but as of this writing Go code never does.
 The above fixed configuration matches the process initialization
 control bits specified by the ELF AMD64 ABI.
 
+*理由*：固定 MXCSR 控制配置允许 Go 函数使用 SSE 操作，而无需修改或保存 MXCSR。
+函数可以在调用之间修改它（只要它们能还原它），但在写 Go 代码从来没有这样做过。
+上述固定配置与 ELF AMD64 ABI 规定的进程初始化控制位匹配。
+
 The x87 floating-point control word is not used by Go on amd64.
 
+Go 在 amd64 上不使用 x87 浮点控制字。
+
 ## Future directions
+
+## 未来方向
 
 ### Spill path improvements
 
