@@ -688,11 +688,19 @@ signal-based panics.
 
 #### Stack layout
 
+#### 堆栈布局
+
 The stack pointer, RSP, grows down and is always aligned to 8 bytes.
 
 The amd64 architecture does not use a link register.
 
 A function's stack frame is laid out as follows:
+
+堆栈指针 RSP 向下增长，并始终按 8 字节对齐。
+
+amd64 体系结构不使用链接寄存器。
+
+函数的堆栈帧如下所示：
 
     +------------------------------+
     | return PC                    |
@@ -708,9 +716,15 @@ saves the value of RBP directly below the return PC.
 A leaf function that does not require any stack space may omit the
 saved RBP.
 
+压入 "return PC" 作为标准 amd64 `CALL` 操作的一部分
+输入时，函数从 RSP 中减去，以打开其堆栈帧并将 RBP 值直接保存在 return PC 的下方。
+不需要任何堆栈空间的叶子函数可能会忽略保存的RBP。
+
 The Go ABI's use of RBP as a frame pointer register is compatible with
 amd64 platform conventions so that Go can inter-operate with platform
 debuggers and profilers.
+
+Go ABI 将 RBP 用作帧指针寄存器与 amd64 平台惯例保持兼容，因此 Go 可以与平台调试器和分析器交互操作。
 
 #### Flags
 
