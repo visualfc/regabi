@@ -855,6 +855,8 @@ spill paths.
 
 ### Clobber sets
 
+### 覆盖集合
+
 As defined, the ABI does not use callee-save registers.
 This significantly simplifies the garbage collector and the compiler's
 register allocator, but at some performance cost.
@@ -863,6 +865,12 @@ sets*: for each function, the compiler records the set of registers it
 clobbers (including those clobbered by functions it calls) and any
 register not clobbered by function F can remain live across calls to
 F.
+
+根据定义，ABI 不使用被调用方保存寄存器。
+这大大简化了垃圾回收器和编译器的寄存器分配器，但要付出一定的性能代价。
+Go代码的一个可能更好的平衡是使用 *clobber set*：对于每个函数，
+编译器记录它所覆盖的寄存器集（包括那些被它调用的函数覆盖的寄存器集），
+任何没有被函数 F 覆盖的寄存器都可以在对 F 的调用中保持活动状态。
 
 This is generally a good fit for Go because Go's package DAG allows
 function metadata like the clobber set to flow up the call graph, even
@@ -873,7 +881,14 @@ One disadvantage of clobber sets over callee-save registers is that
 they don't help with indirect function calls or interface method
 calls, since static information isn't available in these cases.
 
+这通常非常适合 Go，因为 Go的包 DAG 允许函数元数据（如覆盖集）在调用图中向上流动，甚至跨越包边界。
+与一般的被调用方保存寄存器不同，覆盖集对垃圾收集器的更改相对较少。
+被调用方保存寄存器上的覆盖集的一个缺点是，它们对间接函数调用或接口方法调用没有帮助，
+因为在这些情况下静态信息不可用。
+
 ### Large aggregates
+
+### 大的聚合体
 
 Go encourages passing composite values by value, and this simplifies
 reasoning about mutation and races.
@@ -881,7 +896,13 @@ However, this comes at a performance cost for large composite values.
 It may be possible to instead transparently pass large composite
 values by reference and delay copying until it is actually necessary.
 
+Go 鼓励按值传递复合值，这简化了结构变化和竞态的推理(reasoning about mutation and races)。
+然而，对于较大的复合值来说，这是以性能为代价的。
+可以通过引用显式地传递大的复合值，并延迟复制直到实际需要为止。
+
 ## Appendix: Register usage analysis
+
+## 附录: 寄存器使用分析
 
 In order to understand the impacts of the above design on register
 usage, we
