@@ -847,6 +847,12 @@ These options all add enough complexity that we will have to make this
 decision based on the actual code size growth caused by the static
 spill paths.
 
+静态生成的溢出路径也会增加代码大小。有可能在运行时使用生成溢出路径来代替，当作 `morestack` 的一部分。
+但是，这会使保留溢出空间变得复杂，因为在大多数情况下，溢出所有可能的寄存器参数会比只溢出特定函数使用的寄存器参数占用更多的空间。
+有些选项是溢出到临时空间并仅复制回函数使用的寄存器，或者在溢出到堆栈之前（如果必要，使用临时空间）增长堆栈（如果必要），
+或者如果堆栈空间不足，则使用堆分配的空间。
+这些选项都增加了足够的复杂性，因此我们必须根据静态溢出路径导致的实际代码大小增长来做出决策。
+
 ### Clobber sets
 
 As defined, the ABI does not use callee-save registers.
