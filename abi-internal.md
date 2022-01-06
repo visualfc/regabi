@@ -238,13 +238,13 @@ assigned to registers or the stack using the following algorithm:
    设 S 为定义堆栈帧的类型序列，为空。
 1. 如果 F 是方法，分配 F 的接收器。
 1. 对于 F 的每个参数 A，分配 A。
-1. 向 S 添加指针对齐字段，该字段的大小为 0，对齐方式与 `uintptr` 相同。
+1. 添加指针对齐字段到 S，字段的大小为 0，对齐方式与 `uintptr` 相同。
 1. 将 I 和 FP 重置为 0。
 1. 对于 F 的每个结果 R，分配 R。
-1. 将指针对齐字段添加到 S。
+1. 添加指针对齐字段到 S。
 1. 对于 F 每个寄存器分配的接收器和参数，设 T 为其类型，并将 T 添加到堆栈序列 S 中。
    这是参数(或接收器)的溢出空间，在调用时未初始化。
-1. 添加一个指针对齐字段到 S。
+1. 添加指针对齐字段到 S。
 
 Assigning a receiver, argument, or result V of underlying type T works
 as follows:
